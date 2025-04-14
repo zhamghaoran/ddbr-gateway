@@ -15,6 +15,7 @@ type Client interface {
 	Get(ctx context.Context, req *gateway.GetRequest, callOptions ...callopt.Option) (r *gateway.GetResponse, err error)
 	RegisterSever(ctx context.Context, req *gateway.RegisterSeverReq, callOptions ...callopt.Option) (r *gateway.RegisterSeverResp, err error)
 	RegisterGateway(ctx context.Context, req *gateway.RegisterGatewayReq, callOptions ...callopt.Option) (r *gateway.RegisterGatewayResp, err error)
+	SetLeader(ctx context.Context, req *gateway.SetLeaderReq, callOptions ...callopt.Option) (r *gateway.SetLeaderResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -64,4 +65,9 @@ func (p *kGatewayClient) RegisterSever(ctx context.Context, req *gateway.Registe
 func (p *kGatewayClient) RegisterGateway(ctx context.Context, req *gateway.RegisterGatewayReq, callOptions ...callopt.Option) (r *gateway.RegisterGatewayResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.RegisterGateway(ctx, req)
+}
+
+func (p *kGatewayClient) SetLeader(ctx context.Context, req *gateway.SetLeaderReq, callOptions ...callopt.Option) (r *gateway.SetLeaderResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.SetLeader(ctx, req)
 }

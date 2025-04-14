@@ -16,11 +16,16 @@ func AuthorityMiddleware(next endpoint.Endpoint) endpoint.Endpoint {
 		// get and check password by reflect `Password` field
 		reqV := reflect.ValueOf(request).MethodByName("GetReq").Call(nil)[0].Interface()
 		fmt.Printf("%+v", reqV)
-		commonPassword := reflect.ValueOf(reqV).Elem().FieldByName("Password").Interface()
-		reqPassword := commonPassword.(*common.Password).Password
-		fmt.Println("req password is :" + reqPassword)
-		if reqPassword != service.GetPassword() {
-			return errors.New("password invalid")
+		if reflect.ValueOf(reqV).Elem().FieldByName("Password").IsValid() {
+			commonPassword := reflect.ValueOf(reqV).Elem().FieldByName("Password").Interface()
+			req, ok := commonPassword.(*common.Password)
+			if ok {
+				reqPassword := req.Password
+				fmt.Println("req password is :" + reqPassword)
+				if reqPassword != service.GetPassword() {
+					return errors.New("password invalid")
+				}
+			}
 		}
 		err := next(ctx, request, response)
 		return err

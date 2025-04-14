@@ -26,3 +26,6 @@ func init() {
 func GetPassword() string {
 	return password
 }
+func SetPassword(set string) {
+	password = set
+}

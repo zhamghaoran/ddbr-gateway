@@ -41,6 +41,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"SetLeader": kitex.NewMethodInfo(
+		setLeaderHandler,
+		newGatewaySetLeaderArgs,
+		newGatewaySetLeaderResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -179,6 +186,24 @@ func newGatewayRegisterGatewayResult() interface{} {
 	return gateway.NewGatewayRegisterGatewayResult()
 }
 
+func setLeaderHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*gateway.GatewaySetLeaderArgs)
+	realResult := result.(*gateway.GatewaySetLeaderResult)
+	success, err := handler.(gateway.Gateway).SetLeader(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newGatewaySetLeaderArgs() interface{} {
+	return gateway.NewGatewaySetLeaderArgs()
+}
+
+func newGatewaySetLeaderResult() interface{} {
+	return gateway.NewGatewaySetLeaderResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -224,6 +249,16 @@ func (p *kClient) RegisterGateway(ctx context.Context, req *gateway.RegisterGate
 	_args.Req = req
 	var _result gateway.GatewayRegisterGatewayResult
 	if err = p.c.Call(ctx, "RegisterGateway", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) SetLeader(ctx context.Context, req *gateway.SetLeaderReq) (r *gateway.SetLeaderResp, err error) {
+	var _args gateway.GatewaySetLeaderArgs
+	_args.Req = req
+	var _result gateway.GatewaySetLeaderResult
+	if err = p.c.Call(ctx, "SetLeader", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
